@@ -1,10 +1,16 @@
 const express = require('express')
 const app = express()
 const PORT = 3000
-
+const mongoose = require('mongoose')
 const userRouter = require('./routes/users')
 const authRouter = require('./routes/auth')
 const postsRouter = require('./routes/posts')
+require('dotenv').config()
+
+//DB接続
+mongoose.connect(process.env.MONGO_URL)
+.then(() => console.log('DB接続注'))
+.catch(err => console.log(err))
 
 //ミドルウェア
 app.use('/api/users', userRouter)
