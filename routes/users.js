@@ -55,7 +55,7 @@ router.put('/:id/follow', async (req, res) => {
             //フォローしたい相手のフォロワーに自身がいなければ
             if(!targetUser.followers.includes(req.body.userId)){
                 await targetUser.updateOne({
-                    $push: { followers: req.body.userId }
+                    $push: { followers: req.body.userId } //$push スキーマの配列に追加
                 })
                 await currentUser.updateOne({
                     $push: { followings: req.params.id }
@@ -82,7 +82,7 @@ router.put('/:id/unfollow', async (req, res) => {
             //フォローしたい相手のフォロワーに自身が存在していれば
             if(targetUser.followers.includes(req.body.userId)){
                 await targetUser.updateOne({
-                    $pull: { followers: req.body.userId }
+                    $pull: { followers: req.body.userId } //$pull スキーマの配列から取り除く
                 })
                 await currentUser.updateOne({
                     $pull: { followings: req.params.id }
