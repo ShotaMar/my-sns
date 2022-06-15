@@ -10,7 +10,6 @@ router.put('/:id', async(req, res) => {
                 $set: req.body, //$set は全てのプロパティを更新するという意味
             })
             res.status(200).json('ユーザー情報が更新されました')
-
         }catch(err) {
             return res.status(500).json(err)
         }
@@ -25,7 +24,6 @@ router.delete('/:id', async(req, res) => {
         try{
             const user = await User.findByIdAndDelete(req.params.id)
             res.status(200).json('ユーザー情報が削除されました')
-
         }catch(err) {
             return res.status(500).json(err)
         }
@@ -40,7 +38,6 @@ router.get('/:id', async(req, res) => {
         const user = await User.findById(req.params.id)
         const { password, updatedAt, ...others } = user._doc //_docは全てのプロパティ toJSON()と≒
         return res.status(200).json(others)
-
     }catch(err) {
         return res.status(500).json(err)
     }
@@ -61,7 +58,6 @@ router.put('/:id/follow', async (req, res) => {
                     $push: { followings: req.params.id }
                 })
                 return res.status(200).json('フォローしました')
-
             } else {
                 return res.status(403).json('あなたはすでにこのユーザをフォローしています')
             }
@@ -88,7 +84,6 @@ router.put('/:id/unfollow', async (req, res) => {
                     $pull: { followings: req.params.id }
                 })
                 return res.status(200).json('フォロー解除しました')
-
             } else {
                 return res.status(403).json('あなたはこのユーザをフォローしていません')
             }
