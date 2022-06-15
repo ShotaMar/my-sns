@@ -46,4 +46,58 @@ router.get('/:id', async(req, res) => {
     }
 })
 
+//ユーザのフォロー
+router.put('/:id/follow', async (req, res) => {
+    if(req.body.userId != req.params.id){
+        try{
+            const targetUser = await User.findById(req.params.id)
+            const currentUser = await User.findById(req.body.userId)
+            //フォローしたい相手のフォロワーに自身がいなければ
+            if(!targetUser.followers.includes(req.body.userId)){
+                await targetUser.updateOne({
+                    $push: { followers: req.body.userId }
+                })
+                await currentUser.updateOne({
+                    $push: { followings: req.params.id }
+                })
+                return res.status(200).json('フォローしました')
+
+            } else {
+                return res.status(403).json('あなたはすでにこのユーザをフォローしています')
+            }
+        }catch(err) {
+            return res.status(500).json(err)
+        }
+    }else{
+        return res.status(500).json('自分自身はフォローできません')
+    }
+})
+
+//ユーザのフォロー解除
+router.put('/:id/unfollow', async (req, res) => {
+    if(req.body.userId != req.params.id){
+        try{
+            const targetUser = await User.findById(req.params.id)
+            const currentUser = await User.findById(req.body.userId)
+            //フォローしたい相手のフォロワーに自身が存在していれば
+            if(targetUser.followers.includes(req.body.userId)){
+                await targetUser.updateOne({
+                    $pull: { followers: req.body.userId }
+                })
+                await currentUser.updateOne({
+                    $pull: { followings: req.params.id }
+                })
+                return res.status(200).json('フォロー解除しました')
+
+            } else {
+                return res.status(403).json('あなたはこのユーザをフォローしていません')
+            }
+        }catch(err) {
+            return res.status(500).json(err)
+        }
+    }else{
+        return res.status(500).json('自分自身はフォロー解除できません')
+    }
+})
+
 module.exports = router
