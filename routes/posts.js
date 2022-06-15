@@ -1,8 +1,9 @@
 const router = require('express').Router()
 const Post = require('../models/Post')
+const User = require('../models/User')
 
 //投稿する
-router.post('/', async (req, res) => {
+router.post('/', async(req, res) => {
     const newPost = new Post(req.body)
     try{
         const savedPost = await newPost.save()
@@ -33,7 +34,7 @@ router.put('/:id', async(req, res) => {
 })
 
 //投稿の削除
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', async(req, res) => {
     try{
         const post = await Post.findById(req.params.id)
         if(post.userId === req.body.userId){
@@ -50,7 +51,7 @@ router.delete('/:id', async (req, res) => {
 })
 
 //投稿の取得
-router.get('/:id', async (req, res) => {
+router.get('/:id', async(req, res) => {
     try{
         const post = await Post.findById(req.params.id)
         return res.status(200).json(post)
@@ -61,7 +62,7 @@ router.get('/:id', async (req, res) => {
 })
 
 //投稿にいいねorいいねの解除をする
-router.put('/:id/like', async (req, res) => {
+router.put('/:id/like', async(req, res) => {
     try{
         const post = await Post.findById(req.params.id)
 
@@ -80,6 +81,23 @@ router.put('/:id/like', async (req, res) => {
             return res.status(200).json('いいねをやめました')
         }
     }catch(err) {
+        return res.status(500).json(err)
+    }
+})
+
+//タイムラインの投稿を取得
+router.get('/timeline/all', async(req, res) => {  //エンドポイント/timeline/allは上記記載の;idのgetとぶつかるので差別化するように記載する
+    try{
+        const currentUser = await User.findById(req.body.userId)
+        const userPosts = await Post.find({ userId: currentUser._id }) //_id objectID
+        //フォロー中の友達の投稿内容を全て取得する
+        const friendPosts = await Promise.all(
+            currentUser.followings.map((friendId) => {
+                return Post.find({ userId: friendId })
+            })
+        )
+        return res.status(200).json([...userPosts, ...friendPosts])
+    }catch(err){
         return res.status(500).json(err)
     }
 })
