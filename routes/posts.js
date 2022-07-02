@@ -89,7 +89,6 @@ router.get('/timeline/:userId', async(req, res) => {  //エンドポイント/ti
                 return Post.find({ userId: friendId })
             })
         )
-        console.log(friendPosts)
         return res.status(200).json(userPosts.concat(...friendPosts))
     }catch(err){
         return res.status(500).json(err)
