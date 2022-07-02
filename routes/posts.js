@@ -79,9 +79,9 @@ router.put('/:id/like', async(req, res) => {
 })
 
 //タイムラインの投稿を取得
-router.get('/timeline/all', async(req, res) => {  //エンドポイント/timeline/allは上記記載の;idのgetとぶつかるので差別化するように記載する
+router.get('/timeline/:userId', async(req, res) => {  //エンドポイント/timeline/allは上記記載の;idのgetとぶつかるので差別化するように記載する
     try{
-        const currentUser = await User.findById(req.body.userId)
+        const currentUser = await User.findById(req.params.userId)
         const userPosts = await Post.find({ userId: currentUser._id }) //_id objectID
         //フォロー中の友達の投稿内容を全て取得する
         const friendPosts = await Promise.all(
@@ -89,7 +89,8 @@ router.get('/timeline/all', async(req, res) => {  //エンドポイント/timeli
                 return Post.find({ userId: friendId })
             })
         )
-        return res.status(200).json([...userPosts, ...friendPosts])
+        console.log(friendPosts)
+        return res.status(200).json(userPosts.concat(...friendPosts))
     }catch(err){
         return res.status(500).json(err)
     }
