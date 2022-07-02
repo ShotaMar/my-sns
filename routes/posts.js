@@ -96,4 +96,15 @@ router.get('/timeline/:userId', async(req, res) => {  //エンドポイント/ti
     }
 })
 
+//profile専用のタイムラインの投稿を取得
+router.get('/profile/:username', async(req, res) => {  //エンドポイント/timeline/allは上記記載の;idのgetとぶつかるので差別化するように記載する
+    try{
+        const user = await User.findOne({ username: req.params.username})
+        const posts = await Post.find({ userId: user._id }) //_id objectID
+        return res.status(200).json(posts)
+    }catch(err){
+        return res.status(500).json(err)
+    }
+})
+
 module.exports = router
